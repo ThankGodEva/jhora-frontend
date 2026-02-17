@@ -1,12 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import AuthLayout from '@/components/AuthLayout';
 import api from '@/lib/api';
 import { Link } from 'lucide-react';
 
 export default function FullInfo() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <FullInfoContent />
+    </Suspense>
+  );
+}
+
+function FullInfoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
