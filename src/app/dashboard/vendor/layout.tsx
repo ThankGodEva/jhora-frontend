@@ -19,30 +19,31 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
       return;
     }
 
-    const fetchUser = async () => {
-      try {
-        const res = await api.get('/me');
-        if (res.data.role !== 'icreator' && res.data.role !== 'vendor') {
+    api.get('/me')
+      .then(res => {
+        const user = res.data;
+        console.log('User role from /me:', user.role); // ← Debug: see actual role
+
+        // Accept both 'icreator' and 'vendor' (case-insensitive)
+        if (!['icreator', 'vendor'].includes(user.role?.toLowerCase())) {
           router.push('/');
           return;
         }
-        setUser(res.data);
-      } catch (err: any) {
+
+        setUser(user);
+      })
+      .catch(err => {
         console.error('Auth check failed:', err);
-        // Only remove token on 401 (unauthorized)
+        // Only clear token on clear 401, not on 500 or other errors
         if (err.response?.status === 401) {
           localStorage.removeItem('token');
           router.push('/login');
         } else {
-          // For 500/404/etc., show error or fallback
-          setError('Failed to load user data');
+          // Show error but don't redirect/loop
+          setError('Failed to load user profile. Please try again.');
         }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
+      })
+      .finally(() => setLoading(false));
   }, [router]);
 
   if (loading) {
