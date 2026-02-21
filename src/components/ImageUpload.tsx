@@ -6,7 +6,9 @@ import { UploadCloud } from 'lucide-react';
 interface ImageUploadProps {
   label: string;
   onUpload: (file: File) => void;
-  preview?: string;
+  preview?: string | null;  // ← add | null here
+  accept?: string;
+  maxSizeMB?: number;
 }
 
 export default function ImageUpload({ label, onUpload, preview }: ImageUploadProps) {
