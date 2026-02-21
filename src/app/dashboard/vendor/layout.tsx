@@ -10,6 +10,7 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -21,14 +22,21 @@ export default function VendorDashboardLayout({ children }: { children: React.Re
     const fetchUser = async () => {
       try {
         const res = await api.get('/me');
-        if (res.data.role !== 'icreator') {
+        if (res.data.role !== 'icreator' && res.data.role !== 'vendor') {
           router.push('/');
           return;
         }
         setUser(res.data);
-      } catch (err) {
-        localStorage.removeItem('token');
-        router.push('/login');
+      } catch (err: any) {
+        console.error('Auth check failed:', err);
+        // Only remove token on 401 (unauthorized)
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          router.push('/login');
+        } else {
+          // For 500/404/etc., show error or fallback
+          setError('Failed to load user data');
+        }
       } finally {
         setLoading(false);
       }
