@@ -23,21 +23,28 @@ export default function LoginPage() {
         const { token } = res.data;
 
         localStorage.setItem('token', token);
-        api.defaults.headers.Authorization = `Bearer ${token}`;
-
+        api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
         router.push('/');
-      } catch (err: any) {
-        const response = err.response?.data;
 
-        if (response?.message && response?.errors) {
-          // Show full validation errors
-          const errorDetails = Object.values(response.errors)
-            .flat()
-            .join('\n');
-          setError(`${response.message}\n\nDetails:\n${errorDetails}`);
+      } catch (err: any) {
+        const response = err.response;
+
+        if (response?.status === 422) {
+          // Handle validation/auth failure gracefully
+          const message = response.data.message || 'Invalid email or password.';
+          const details = response.data.errors?.email?.[0] || '';
+
+          setError(`${message} ${details}`.trim());
+          // Optional: show toast
+          // toast.error(message);
+        } else if (response?.status === 500) {
+          setError('Server error. Please try again later.');
         } else {
-          setError(response?.message || 'Login failed. Please try again.');
+          setError('An unexpected error occurred. Please try again.');
         }
+
+        console.error('Login error:', err); // keep for debugging
+
       } finally {
         setLoading(false);
       }
@@ -47,6 +54,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-orange-600">JHORA Login</h1>
+        
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-lg">
+            <p className="font-medium">{error}</p>
+          </div>
+        )}
         
         <form onSubmit={handleLogin}>
           <div className="mb-4">
