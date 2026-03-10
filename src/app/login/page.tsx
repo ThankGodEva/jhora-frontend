@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,53 +15,53 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setError('');
-      setLoading(true);
+    e.preventDefault();
+    setError(''); // if you have local error state
+    setLoading(true);
 
-      try {
-        const res = await api.post('/login', { email, password });
-        const { token } = res.data;
+    try {
+      const res = await api.post('/login', { email, password });
 
-        localStorage.setItem('token', token);
-        api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
-        router.push('/');
+      // Success
+      localStorage.setItem('token', res.data.token);
+      api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
 
-      } catch (err: any) {
-        const response = err.response;
+      toast.success('Login successful! Welcome back.', {
+        duration: 3000,
+        position: 'top-center',
+      });
 
-        if (response?.status === 422) {
-          // Handle validation/auth failure gracefully
-          const message = response.data.message || 'Invalid email or password.';
-          const details = response.data.errors?.email?.[0] || '';
+      router.push('/'); // or dashboard
 
-          setError(`${message} ${details}`.trim());
-          // Optional: show toast
-          // toast.error(message);
-        } else if (response?.status === 500) {
-          setError('Server error. Please try again later.');
-        } else {
-          setError('An unexpected error occurred. Please try again.');
-        }
+    } catch (err: any) {
+      const response = err.response;
 
-        console.error('Login error:', err); // keep for debugging
+      let message = 'An unexpected error occurred. Please try again.';
 
-      } finally {
-        setLoading(false);
+      if (response?.status === 422) {
+        message = response.data.message || 'Invalid email or password. Please check your credentials.';
+      } else if (response?.status === 500) {
+        message = 'Server error. Please try again later.';
       }
-    };
+
+      // Show toast instead of (or in addition to) inline error
+      toast.error(message, {
+        duration: 5000,
+        position: 'top-center',
+      });
+
+      // Optional: keep inline error if you prefer both
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-orange-600">JHORA Login</h1>
-        
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-lg">
-            <p className="font-medium">{error}</p>
-          </div>
-        )}
-        
+
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label className="block mb-1">Email</label>
