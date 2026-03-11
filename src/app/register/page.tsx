@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthLayout from '@/components/AuthLayout';
 import api from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function Register() {
   const [step, setStep] = useState(1);
@@ -113,6 +114,57 @@ export default function Register() {
       } else {
         setError(response?.message || 'Registration failed. Please try again.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const toastId = toast.loading('Creating your account...', {
+      position: 'top-center',
+    });
+
+    try {
+      const res = await api.post('/register', {
+        // your registration data: name, email, password, etc.
+      });
+
+      // Success
+      localStorage.setItem('token', res.data.token);
+      api.defaults.headers.Authorization = `Bearer ${res.data.token}`;
+
+      toast.success('Registration successful! Welcome to JHORA 🎉', {
+        duration: 5000,
+        position: 'top-center',
+      });
+
+      router.push('/'); // or dashboard
+
+    } catch (err: any) {
+      const response = err.response;
+
+      let message = 'An unexpected error occurred. Please try again.';
+
+      if (response?.status === 422) {
+        // Validation error (e.g. email taken, password too short)
+        message = response.data.message || 'Please check your details.';
+        if (response.data.errors?.email) {
+          message = response.data.errors.email[0]; // e.g. "The email has already been taken."
+        } else if (response.data.errors?.password) {
+          message = response.data.errors.password[0];
+        }
+      } else if (response?.status === 500) {
+        message = 'Server error. Please try again later.';
+      }
+
+      toast.error(message, {
+        duration: 6000,
+        position: 'top-center',
+      });
+
     } finally {
       setLoading(false);
     }
