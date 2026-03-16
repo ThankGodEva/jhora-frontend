@@ -4,9 +4,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Heart, User, Search, Menu, X } from 'lucide-react';
+import { ShoppingCart, Heart, User, Search, Menu, X } from 'lucide-react';
+import { useCartStore } from '@/lib/cartStore';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const totalItems = useCartStore((state) => state.totalItems());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
@@ -76,12 +78,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/wishlist" className="text-gray-600 hover:text-orange-600">
                 <Heart size={24} />
               </Link>
-              <Link href="/cart" className="text-gray-600 hover:text-orange-600 relative">
+
+              <Link href="/cart" className="relative flex items-center gap-2 text-gray-700 hover:text-orange-600">
+                <ShoppingCart size={24} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+
+              {/* <Link href="/cart" className="text-gray-600 hover:text-orange-600 relative">
                 <ShoppingBag size={24} />
                 <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   3
                 </span>
-              </Link>
+              </Link> */}
+
               <Link href="/dashboard" className="text-gray-600 hover:text-orange-600">
                 <User size={24} />
               </Link>
