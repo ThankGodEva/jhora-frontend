@@ -4,12 +4,74 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import BuyerLayout from '@/components/BuyerLayout';
+import { PaystackButton } from 'react-paystack';
+import { useCartStore } from '@/lib/cartStore';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function Checkout() {
   const [step, setStep] = useState(1);
 
   const nextStep = () => setStep(s => Math.min(4, s + 1));
   const prevStep = () => setStep(s => Math.max(1, s - 1));
+
+  const { items, totalPrice, clearCart } = useCartStore();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const config = {
+    reference: new Date().getTime().toString(),
+    email: "user@example.com", // replace with real user email (from auth)
+    amount: totalPrice() * 100, // Paystack uses kobo (multiply by 100)
+    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '',
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Cart Items",
+          variable_name: "cart_items",
+          value: JSON.stringify(items.map(i => ({ id: i.id, qty: i.quantity }))),
+        },
+      ],
+    },
+  };
+
+  const onSuccess = (reference: any) => {
+    toast.success('Payment successful! Reference: ' + reference.reference);
+    // Send reference to your backend to verify & create order
+    verifyPayment(reference.reference);
+    clearCart();
+    router.push('/order-success');
+  };
+
+  const onClose = () => {
+    toast.error('Payment cancelled');
+  };
+
+  const verifyPayment = async (reference: string) => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/verify-paystack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Order confirmed!');
+      } else {
+        toast.error('Payment verification failed');
+      }
+    } catch (err) {
+      toast.error('Error verifying payment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (items.length === 0) {
+    return <div className="p-8 text-center">Your cart is empty</div>;
+  }
 
   return (
     <BuyerLayout>
@@ -97,15 +159,11 @@ export default function Checkout() {
               <div className="space-y-4">
                 <label className="flex items-center gap-3">
                   <input type="radio" name="payment" className="accent-orange-600" defaultChecked />
-                  <span className="font-medium">Bank Transfer</span>
-                </label>
-                <label className="flex items-center gap-3">
-                  <input type="radio" name="payment" className="accent-orange-600" />
-                  <span className="font-medium">Paystack</span>
-                </label>
-                <label className="flex items-center gap-3">
-                  <input type="radio" name="payment" className="accent-orange-600" />
-                  <span className="font-medium">Flutterwave</span>
+                  <span className="font-medium">Paystack
+                    <p className="text-center text-sm text-gray-500 mt-4">
+                      Secure payment powered by Paystack
+                    </p>
+                  </span>
                 </label>
               </div>
 
@@ -131,7 +189,17 @@ export default function Checkout() {
                 Back
               </button>
               <button onClick={nextStep} className="flex-1 bg-orange-600 text-white py-4 rounded-xl font-bold">
-                Pay Now
+                {/* Paystack Button */}
+      <div className="text-center">
+        <PaystackButton
+          {...config}
+          text="Pay with Paystack"
+          onSuccess={onSuccess}
+          onClose={onClose}
+          className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-xl font-bold text-lg transition disabled:opacity-50"
+          disabled={loading || !process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY}
+        />
+      </div>
               </button>
             </div>
           </div>
