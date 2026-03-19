@@ -54,67 +54,105 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-orange-500 to-orange-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Discover Products From Different Creators
+      {/* HERO BANNER - Updated with your image */}
+      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
+        {/* Your image as background */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: "url('/images/hero-background.jpg')" 
+          }}
+        />
+
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/60" />
+
+        {/* Content */}
+        <div className="relative text-center px-6 max-w-4xl z-10">
+          <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">
+            Discover Products From<br />Different iCreators
           </h1>
-          <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto">
-            Authentic handmade items made by local Nigerian creators representing Nigeria's rich culture
+          <p className="text-xl text-white/90 mb-10 max-w-lg mx-auto">
+            Authentic, handmade treasures from Nigeria's most creative minds
           </p>
-          <button className="bg-white text-orange-600 px-10 py-5 text-xl font-bold rounded-full hover:bg-gray-100 transition shadow-lg">
-            Start Shopping
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/products"
+              className="bg-orange-600 text-white px-10 py-4 rounded-full font-medium text-lg hover:bg-orange-700 transition inline-block"
+            >
+              Start shopping
+            </Link>
+            <Link
+              href="/become-icreator"
+              className="border-2 border-white text-white px-10 py-4 rounded-full font-medium text-lg hover:bg-white hover:text-black transition inline-block"
+            >
+              Become an iCreator
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* FEATURED PRODUCTS */}
       <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Featured Products
-          </h2>
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-left mb-5">Featured Products</h2>
+          <p className="text-xl text-300 max-w-3xl mb-10">
+              Discover authentic products made by local creators representing Nigeria's rich culture
+          </p>
 
           {loading ? (
-            <div className="text-center py-10">
-              <p className="text-gray-600 text-lg">Loading featured items...</p>
-            </div>
-          ) : featuredProducts.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-gray-600 text-lg">No featured products yet</p>
-            </div>
+            <div className="text-center py-12">Loading featured products...</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {featuredProducts.map((product) => (
-                <Link 
-                  href={`/product/${product.slug}`} 
-                  key={product.id}
-                  className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
-                >
-                  <div className="relative aspect-square">
+                <Link href={`/product/${product.slug}`} key={product.id} className="group">
+                  <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-64 object-cover group-hover:scale-105 transition"
                     />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-orange-600">
-                      {product.name}
-                    </h3>
-                    <p className="text-orange-600 font-bold mt-1">{product.price}</p>
-                    {product.compare_price && (
-                      <p className="text-sm text-gray-500 line-through">{product.compare_price}</p>
-                    )}
-                    <p className="text-gray-500 text-sm mt-1">
-                      by {product.vendor}
-                    </p>
+                    <div className="p-4">
+                      <h3 className="font-medium text-lg line-clamp-2">{product.name}</h3>
+                      <p className="text-orange-600 font-bold mt-1">{product.price}</p>
+                    </div>
                   </div>
                 </Link>
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* SHOWCASE, RUN AND SCALE AS AN iCREATOR */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Showcase, Run and Scale as an iCreator</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "For small local brands",
+                desc: "We promote visibility for creators at any stage in their business.",
+                icon: "🌱",
+              },
+              {
+                title: "Encourage local arts",
+                desc: "We promote visibility for creators at any stage in their business.",
+                icon: "🎨",
+              },
+              {
+                title: "Encourage local arts",
+                desc: "We promote visibility for creators at any stage in their business.",
+                icon: "🌍",
+              },
+            ].map((item, i) => (
+              <div key={i} className="bg-white p-8 rounded-3xl text-center shadow hover:shadow-xl transition">
+                <div className="text-6xl mb-6">{item.icon}</div>
+                <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
+                <p className="text-gray-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -210,7 +248,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Creator of the Month
+              iCreator of the Month
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Spotlight on the creator of the month – combining independence and locality
@@ -285,6 +323,58 @@ export default function Home() {
         </div>
       </section>
 
+      {/* LET OTHERS KNOW */}
+      <section className="py-16 bg-orange-50">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">You've got the product, let others know</h2>
+          <Link href="/@tenibags" className="mt-6 inline-block bg-orange-600 text-white px-10 py-3 rounded-full hover:bg-orange-700 transition">
+            Start selling
+          </Link>
+        </div>
+      </section>
+
+      {/* iCREATORS PROMOTING THE CULTURE */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">iCreators promoting the culture</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {['Nol Astler', 'Ori & Thread', 'Savanna Soles', 'Río Fila'].map((name, i) => (
+              <div key={i} className="text-center">
+                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-orange-200">
+                  <img src={`https://via.placeholder.com/150/FF6200/FFFFFF?text=${name[0]}`} alt={name} className="w-full h-full object-cover" />
+                </div>
+                <p className="font-medium mt-4">{name}</p>
+              </div>
+            ))}
+          </div>
+          <div className='mt-10 mx-auto py-3 px-2 text-center'>
+            <Link href="/@tenibags" className="mt-8 px-8 py-4 rounded-full overflow-hidden border-4 border-black-200">
+              Explore iCreators
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* iCREATE, DISPLAY, SELL */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">iCreate, Display, Sell</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[ 
+              { step: "1", title: "Create shop profile", desc: "It's simple, open a sellers account, list and publish items." },
+              { step: "2", title: "List your products", desc: "We promote visibility for creators at any stage in their business." },
+              { step: "3", title: "Sell & get paid", desc: "You get paid for your creations." },
+            ].map((item) => (
+              <div key={item.step} className="bg-white p-8 rounded-3xl text-center shadow hover:shadow-xl transition">
+                <div className="text-5xl font-bold text-orange-600 mb-4">{item.step}</div>
+                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                <p className="text-gray-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* iCreate, Display, Sell – How It Works - 3 Steps */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -330,7 +420,7 @@ export default function Home() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-center mb-12">
-            Shop Collection
+            Shop By Collection
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -385,6 +475,15 @@ export default function Home() {
               View More Creators
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Start Selling */}
+      <section className="py-16 bg-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <button className="bg-orange-600 text-white px-8 py-4 text-lg rounded-full hover:bg-orange-700">
+            Start selling
+          </button>
         </div>
       </section>
 
