@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { ShoppingCart, Heart, Plus, Minus, Star } from 'lucide-react';
 import { useCartStore } from '@/lib/cartStore';
+import { useWishlistStore } from '@/lib/wishlistStore';
 import api from '@/lib/api';
 import ProductHeader from '@/components/ProductHeader';  // ← import the new header
 import Link from 'next/link';
@@ -16,7 +17,10 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const { addItem } = useCartStore();
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const { addItem: addToCart } = useCartStore();
+  const { toggleItem: toggleWishlist, hasItem: isInWishlist } = useWishlistStore();
 
   useEffect(() => {
     if (!slug) return;
@@ -45,7 +49,7 @@ export default function ProductDetail() {
       return;
     }
 
-    addItem({
+    addToCart({
       id: product.id,
       name: product.name,
       slug: product.slug,
@@ -64,6 +68,33 @@ export default function ProductDetail() {
     if (newQty >= 1 && newQty <= (product?.stock_quantity || 10)) {
       setQuantity(newQty);
     }
+  };
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+
+    toggleWishlist({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      image: product.image,
+    });
+
+    const isWishlisted = isInWishlist(product.id);
+    toast.success(isWishlisted ? 'Added to Wishlist ❤️' : 'Removed from Wishlist');
+  };
+
+  const handleSubmitReview = () => {
+    if (!reviewText.trim()) {
+      toast.error('Please write a review');
+      return;
+    }
+
+    // For now, just show success (connect to backend later)
+    toast.success('Thank you! Your review has been submitted.');
+    setReviewText('');
+    setReviewRating(5);
   };
 
   if (loading) {
@@ -249,8 +280,12 @@ export default function ProductDetail() {
                   Add to Cart
                 </button>
 
-                <button className="flex-1 border-2 border-gray-300 py-5 rounded-xl hover:bg-gray-50 transition font-bold text-lg flex items-center justify-center gap-3">
-                  <Heart size={24} />
+                {/* Wishlist Button */}
+                <button 
+                  onClick={handleWishlistToggle}
+                  className={`flex border-2 border-black-300 py-5 px-5 rounded-xl items-center gap-3 text-xl ${isInWishlist(product.id) ? 'text-red-500' : 'text-gray-600 hover:text-red-500'}`}
+                >
+                  <Heart size={24} className={isInWishlist(product.id) ? 'fill-current' : ''} />
                   Add to Wishlist
                 </button>
               </div>
@@ -284,31 +319,59 @@ export default function ProductDetail() {
         </div>
       </main>
 
-      {/* Reviews Summary */}
-      <div className="mt-16 border-t pt-12">
-        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={28} className="text-yellow-400 fill-yellow-400" />
+      {/* Reviews Section - with padding */}
+      <div className="mt-16 pt-12 border-t">
+        <h2 className="text-2xl font-bold mb-8">Customer Reviews</h2>
+
+        {/* Review Form - only for logged in users */}
+        <div className="mb-12 bg-gray-50 p-8 rounded-2xl">
+          <h3 className="font-semibold mb-4">Write a Review</h3>
+          <div className="flex gap-2 mb-4">
+            {[1,2,3,4,5].map((star) => (
+              <button
+                key={star}
+                onClick={() => setReviewRating(star)}
+                className={`text-3xl ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
+              >
+                ★
+              </button>
             ))}
           </div>
-          <span className="text-2xl font-bold">4.8</span>
-          <span className="text-gray-600">(124 reviews)</span>
+          <textarea
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+            placeholder="Write your review here..."
+            className="w-full h-32 p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+          <button
+            onClick={handleSubmitReview}
+            className="mt-4 bg-orange-600 text-white px-8 py-3 rounded-xl hover:bg-orange-700"
+          >
+            Submit Review
+          </button>
         </div>
 
-        <button className="text-orange-600 hover:underline font-medium">
-          See all reviews →
-        </button>
+        {/* Existing reviews with padding */}
+        <div className="space-y-8">
+          {/* Sample reviews */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm">
+            <p className="font-medium">Great quality bag! Very durable.</p>
+            <div className="flex text-yellow-400 mt-2">★★★★☆</div>
+            <p className="text-sm text-gray-500 mt-3">- Adewale O.</p>
+          </div>
+        </div>
       </div>
 
-      {/* You may also like */}
-      <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-8">You may also like</h2>
+      {/* Related Products - with padding */}
+      <div className="mt-16 pt-12 border-t">
+        <h2 className="text-2xl font-bold mb-8">You May Also Like</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Placeholder - add real related products later */}
+          {/* Placeholder products */}
           {[1,2,3,4].map(i => (
-            <div key={i} className="bg-gray-100 h-64 rounded-xl" />
+            <div key={i} className="bg-white rounded-xl shadow-sm p-4">
+              <div className="h-52 bg-gray-200 rounded-xl mb-4" />
+              <p className="font-medium">Related Product {i}</p>
+            </div>
           ))}
         </div>
       </div>

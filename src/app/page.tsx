@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Layout from '@/components/Layout';
 import Link from 'next/link';
+import { Heart } from 'lucide-react';
 
 interface FeaturedProduct {
   id: number;
@@ -106,12 +107,14 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {featuredProducts.map((product) => (
                 <Link href={`/product/${product.slug}`} key={product.id} className="group">
-                  <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition"
-                    />
+                  <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition relative">
+                    <img src={product.image} alt={product.name} className="w-full h-64 object-cover" />
+                    
+                    {/* Wishlist icon */}
+                    <button className="absolute top-4 right-4 bg-white p-2 rounded-full shadow hover:bg-red-50 transition">
+                      <Heart size={20} className="text-gray-700 hover:text-red-500" />
+                    </button>
+
                     <div className="p-4">
                       <h3 className="font-medium text-lg line-clamp-2">{product.name}</h3>
                       <p className="text-orange-600 font-bold mt-1">{product.price}</p>
@@ -248,7 +251,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              iCreator of the Month
+              !Creator of the Month
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Spotlight on the creator of the month – combining independence and locality
@@ -375,47 +378,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* iCreate, Display, Sell – How It Works - 3 Steps */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center mb-16">
-            iCreate, Display, Sell
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {[
-              {
-                step: "1",
-                title: "Create profile",
-                description: "Create shop profile for creators in any stage of their business. Feel seen, heard and patronized.",
-                icon: "https://via.placeholder.com/80/FF6200/FFFFFF?text=1",
-              },
-              {
-                step: "2",
-                title: "List products",
-                description: "List products for creators in any stage of their business. Feel seen, heard and patronized.",
-                icon: "https://via.placeholder.com/80/FF6200/FFFFFF?text=2",
-              },
-              {
-                step: "3",
-                title: "Sell & get paid",
-                description: "Sell paid for creators in any stage of their business. Feel seen, heard and patronized.",
-                icon: "https://via.placeholder.com/80/FF6200/FFFFFF?text=3",
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-3xl font-bold">
-                  {item.step}
-                </div>
-                <img src={item.icon} alt="" className="w-20 h-20 mx-auto mb-6" />
-                <h3 className="text-2xl font-semibold mb-4">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Shop Collection Teaser */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -523,17 +485,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Placeholder for more sections */}
-      <section className="py-16 bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-8">Shop By Category</h2>
-          <p className="text-gray-600 mb-12">Coming soon – Bags, Jewelry, Fashion, Art & more...</p>
-          
-          <button className="bg-orange-600 text-white px-8 py-4 text-lg rounded-full hover:bg-orange-700">
-            Explore iCreators
-          </button>
-        </div>
-      </section>
     </Layout>
   );
 }
