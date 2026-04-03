@@ -199,10 +199,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Creators</h4>
+              <h4 className="font-semibold mb-4">iCreators</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/become-creator">Become a Creator</Link></li>
-                <li><Link href="/creators">Explore Creators</Link></li>
+                <li><Link href="/become-creator">Become an iCreator</Link></li>
+                <li><Link href="/creators">Explore iCreators</Link></li>
               </ul>
             </div>
             <div>
@@ -210,6 +210,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/help">Help Center</Link></li>
                 <li><Link href="/contact">Contact Us</Link></li>
+                <li><Link href="/about">About Us</Link></li>
               </ul>
             </div>
           </div>
