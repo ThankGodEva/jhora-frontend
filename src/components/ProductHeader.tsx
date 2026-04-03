@@ -4,11 +4,14 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/lib/cartStore';
 import { useRouter, usePathname } from 'next/navigation';
+import { Heart } from 'lucide-react';
+import { useWishlistStore } from '@/lib/wishlistStore';
 
 export default function ProductHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const totalItems = useCartStore((state) => state.totalItems());
+  const wishlistCount = useWishlistStore((state) => state.totalItems());
 
   // Generate breadcrumb from current path
   const getBreadcrumbs = () => {
@@ -70,16 +73,29 @@ export default function ProductHeader() {
             JHORA
           </Link>
 
-          {/* Cart icon */}
-          <Link href="/cart" className="relative flex items-center gap-1 text-gray-700 hover:text-orange-600">
-            <ShoppingCart size={24} />
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
-            <span className="hidden md:inline"></span>
-          </Link>
+          <div className="flex items-center space-x-6">
+            {/* Cart icon */}
+            <Link href="/cart" className="relative flex items-center gap-2 text-gray-700 hover:text-orange-600">
+              <ShoppingCart size={24} />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+              <span className="hidden md:inline"></span>
+            </Link>
+
+            {/* Wishlist - NEW */}
+            <Link href="/wishlist" className="relative flex items-center gap-2 text-gray-700 hover:text-red-500">
+              <Heart size={24} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+          </div>
+          
         </div>
       </div>
     </header>

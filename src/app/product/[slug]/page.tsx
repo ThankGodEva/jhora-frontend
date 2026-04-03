@@ -73,6 +73,8 @@ export default function ProductDetail() {
   const handleWishlistToggle = () => {
     if (!product) return;
 
+    const isCurrentlyWishlisted = isInWishlist(product.id);
+
     toggleWishlist({
       id: product.id,
       name: product.name,
@@ -81,8 +83,16 @@ export default function ProductDetail() {
       image: product.image,
     });
 
-    const isWishlisted = isInWishlist(product.id);
-    toast.success(isWishlisted ? 'Added to Wishlist ❤️' : 'Removed from Wishlist');
+    if (isCurrentlyWishlisted) {
+      toast.success('Removed from wishlist', {
+        icon: '❤️',
+        duration: 2500,
+      });
+    } else {
+      toast.success(`Added ${product.name} to wishlist! ❤️`, {
+        duration: 3000,
+      });
+    }
   };
 
   const handleSubmitReview = () => {
@@ -188,11 +198,11 @@ export default function ProductDetail() {
             {/* Price */}
             <div className="flex items-baseline gap-4">
               <span className="text-4xl font-bold text-orange-600">
-                ₦{product.price.toLocaleString()}
+                {product.price.toLocaleString()}
               </span>
               {product.compare_price && product.compare_price > product.price && (
                 <span className="text-xl text-gray-500 line-through">
-                  ₦{product.compare_price.toLocaleString()}
+                  {product.compare_price.toLocaleString()}
                 </span>
               )}
             </div>
@@ -281,12 +291,17 @@ export default function ProductDetail() {
                 </button>
 
                 {/* Wishlist Button */}
-                <button 
+                <button
                   onClick={handleWishlistToggle}
-                  className={`flex border-2 border-black-300 py-5 px-5 rounded-xl items-center gap-3 text-xl ${isInWishlist(product.id) ? 'text-red-500' : 'text-gray-600 hover:text-red-500'}`}
+                  className={`flex items-center gap-3 text-xl font-medium transition ${
+                    isInWishlist(product.id) ? 'text-red-500' : 'text-gray-700 hover:text-red-500'
+                  }`}
                 >
-                  <Heart size={24} className={isInWishlist(product.id) ? 'fill-current' : ''} />
-                  Add to Wishlist
+                  <Heart 
+                    size={28} 
+                    className={isInWishlist(product.id) ? 'fill-current' : ''} 
+                  />
+                  {isInWishlist(product.id) ? 'In Wishlist' : 'Add to Wishlist'}
                 </button>
               </div>
             </div>

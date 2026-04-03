@@ -70,9 +70,16 @@ export default function WishlistPage() {
   if (displayedItems.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
-        <Heart size={80} className="text-gray-300 mb-6" />
-        <h2 className="text-3xl font-bold mb-3">Your wishlist is empty</h2>
-        <p className="text-gray-600 mb-8">Save your favorite products here</p>
+        <img src="/images/wishlist.png" alt="" className="w-60 h-70 mb-0 pb-0"/>
+        
+        <h2 className="text-3xl font-bold mb-3">You haven't saved an item yet!</h2>
+        <div className="text-gray-600 mb-10">
+            <p>
+                Found something you like? Tap on the heart shaped icon in a product displayed and add it to your wishlist.
+            </p>
+            <p>✓ Use the heart icon to add or remove favorite.</p>
+            <p>✓ All saved items will appear here.</p>
+        </div>
         <button
           onClick={() => router.push('/')}
           className="bg-orange-600 text-white px-10 py-4 rounded-2xl hover:bg-orange-700"

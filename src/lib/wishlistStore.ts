@@ -15,7 +15,7 @@ interface WishlistStore {
   removeItem: (id: number) => void;
   toggleItem: (product: WishlistItem) => void;
   hasItem: (id: number) => boolean;
-  clearWishlist: () => void;        // ← Add this
+  clearWishlist: () => void;
   totalItems: () => number;
 }
 
@@ -24,18 +24,20 @@ export const useWishlistStore = create<WishlistStore>()(
     (set, get) => ({
       items: [],
 
-      addItem: (product) =>
+      addItem: (product) => {
         set((state) => ({
           items: [...state.items, product],
-        })),
+        }));
+      },
 
-      removeItem: (id) =>
+      removeItem: (id) => {
         set((state) => ({
           items: state.items.filter((item) => item.id !== id),
-        })),
+        }));
+      },
 
       toggleItem: (product) => {
-        const exists = get().items.some((item) => item.id === product.id);
+        const exists = get().hasItem(product.id);
         if (exists) {
           get().removeItem(product.id);
         } else {
@@ -45,7 +47,7 @@ export const useWishlistStore = create<WishlistStore>()(
 
       hasItem: (id) => get().items.some((item) => item.id === id),
 
-      clearWishlist: () => set({ items: [] }),   // ← Implement this
+      clearWishlist: () => set({ items: [] }),
 
       totalItems: () => get().items.length,
     }),

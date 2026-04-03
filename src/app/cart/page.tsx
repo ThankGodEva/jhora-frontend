@@ -20,10 +20,11 @@ export default function CartPage() {
 
   if (totalItems() === 0) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center">
-        <ShoppingCart size={80} className="text-gray-300 mb-6" />
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is empty</h2>
-        <p className="text-gray-600 mb-8">Looks like you haven't added anything yet.</p>
+      <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
+        {/* <ShoppingCart size={80} className="text-gray-300 mb-6" /> */}
+        <img src="/images/cart.png" alt="" className="w-75 h-50 mb-0 pb-0"/>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is lonely!</h2>
+        <p className="text-gray-600 mb-8">Well it doesn’t have to be. Browse our categories and discover amazing products.</p>
         <Link
           href="/"
           className="bg-orange-600 text-white px-10 py-4 rounded-xl hover:bg-orange-700 transition font-medium"
