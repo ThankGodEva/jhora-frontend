@@ -9,6 +9,7 @@ import { useWishlistStore } from '@/lib/wishlistStore';
 import api from '@/lib/api';
 import ProductHeader from '@/components/ProductHeader';  // ← import the new header
 import Link from 'next/link';
+import { ReviewSection } from '@/components/ReviewSection';
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -334,51 +335,13 @@ export default function ProductDetail() {
         </div>
       </main>
 
-      {/* Reviews Section - with padding */}
-      <div className="mt-16 pt-12 border-t">
-        <h2 className="text-2xl font-bold mb-8">Customer Reviews</h2>
-
-        {/* Review Form - only for logged in users */}
-        <div className="mb-12 bg-gray-50 p-8 rounded-2xl">
-          <h3 className="font-semibold mb-4">Write a Review</h3>
-          <div className="flex gap-2 mb-4">
-            {[1,2,3,4,5].map((star) => (
-              <button
-                key={star}
-                onClick={() => setReviewRating(star)}
-                className={`text-3xl ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
-              >
-                ★
-              </button>
-            ))}
-          </div>
-          <textarea
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Write your review here..."
-            className="w-full h-32 p-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-          <button
-            onClick={handleSubmitReview}
-            className="mt-4 bg-orange-600 text-white px-8 py-3 rounded-xl hover:bg-orange-700"
-          >
-            Submit Review
-          </button>
-        </div>
-
-        {/* Existing reviews with padding */}
-        <div className="space-y-8">
-          {/* Sample reviews */}
-          <div className="bg-white p-8 rounded-2xl shadow-sm">
-            <p className="font-medium">Great quality bag! Very durable.</p>
-            <div className="flex text-yellow-400 mt-2">★★★★☆</div>
-            <p className="text-sm text-gray-500 mt-3">- Adewale O.</p>
-          </div>
-        </div>
+      {/* Review System Integration */}
+      <div className="mx-auto px-5 mt-16 pt-12 border-t">
+        <ReviewSection productId={product.id} />
       </div>
 
       {/* Related Products - with padding */}
-      <div className="mt-16 pt-12 border-t">
+      <div className="mx-auto px-5 mt-16 pt-12 border-t">
         <h2 className="text-2xl font-bold mb-8">You May Also Like</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {/* Placeholder products */}
