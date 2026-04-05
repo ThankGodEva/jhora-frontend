@@ -4,9 +4,17 @@ import { useCartStore } from '@/lib/cartStore';
 import { Trash2, Plus, Minus, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import ProductHeader from '@/components/ProductHeader';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCartStore();
+
+  // Safe price formatter
+  const formatPrice = (price: any): string => {
+    if (price == null || price === '') return '0';
+    const num = typeof price === 'string' ? parseFloat(price) : Number(price);
+    return isNaN(num) ? '0' : num.toLocaleString();
+  };
 
   const handleRemove = (id: number) => {
     removeItem(id);
@@ -20,15 +28,12 @@ export default function CartPage() {
 
   if (totalItems() === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center px-4">
-        {/* <ShoppingCart size={80} className="text-gray-300 mb-6" /> */}
-        <img src="/images/cart.png" alt="" className="w-75 h-50 mb-0 pb-0"/>
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Your cart is lonely!</h2>
-        <p className="text-gray-600 mb-8">Well it doesn’t have to be. Browse our categories and discover amazing products.</p>
-        <Link
-          href="/"
-          className="bg-orange-600 text-white px-10 py-4 rounded-xl hover:bg-orange-700 transition font-medium"
-        >
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+        <ProductHeader />
+        <ShoppingCart size={80} className="text-gray-300 mb-6" />
+        <h2 className="text-3xl font-bold text-gray-800 mb-3">Your cart is empty</h2>
+        <p className="text-gray-600 mb-8 text-center max-w-xs">Looks like you haven't added any products yet</p>
+        <Link href="/" className="bg-orange-600 text-white px-10 py-4 rounded-2xl hover:bg-orange-700 transition font-medium">
           Start Shopping
         </Link>
       </div>
@@ -36,87 +41,83 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-10">Your Cart ({totalItems()})</h1>
+    <div className="min-h-screen bg-gray-50">
+      <ProductHeader />
 
-      <div className="grid lg:grid-cols-3 gap-10">
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-6">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col sm:flex-row gap-6 bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition"
-            >
-              <div className="w-full sm:w-40 h-40 flex-shrink-0">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Your Cart ({totalItems()})</h1>
+
+        <div className="grid lg:grid-cols-3 gap-10">
+          {/* Cart Items */}
+          <div className="lg:col-span-2 space-y-6">
+            {items.map((item) => (
+              <div key={item.id} className="flex flex-col sm:flex-row gap-6 bg-white p-6 rounded-2xl shadow-sm">
                 <img
-                  src={item.image}
+                  src={item.image || '/placeholder.jpg'}
                   alt={item.name}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-32 h-32 object-cover rounded-xl"
                 />
-              </div>
 
-              <div className="flex-1 space-y-4">
-                <div>
-                  <h3 className="text-xl font-semibold">{item.name}</h3>
-                  <p className="text-orange-600 font-bold mt-1">
-                    ₦{item.price.toLocaleString()}
+                <div className="flex-1">
+                  <h3 className="font-semibold text-xl">{item.name}</h3>
+                  <p className="text-orange-600 font-bold text-lg mt-1">
+                    ₦{formatPrice(item.price)}
                   </p>
-                </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center border rounded-lg overflow-hidden">
+                  <div className="flex items-center gap-6 mt-6">
+                    <div className="flex items-center border rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                        className="px-4 py-3 hover:bg-gray-100 transition"
+                        disabled={item.quantity <= 1}
+                      >
+                        <Minus size={18} />
+                      </button>
+                      <span className="px-8 font-medium">{item.quantity}</span>
+                      <button
+                        onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                        className="px-4 py-3 hover:bg-gray-100 transition"
+                      >
+                        <Plus size={18} />
+                      </button>
+                    </div>
+
                     <button
-                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition"
-                      disabled={item.quantity <= 1}
+                      onClick={() => handleRemove(item.id)}
+                      className="text-red-600 hover:text-red-700 flex items-center gap-2"
                     >
-                      <Minus size={18} />
-                    </button>
-                    <span className="px-6 py-2 font-medium">{item.quantity}</span>
-                    <button
-                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition"
-                    >
-                      <Plus size={18} />
+                      <Trash2 size={20} />
+                      Remove
                     </button>
                   </div>
+                </div>
 
-                  <button
-                    onClick={() => handleRemove(item.id)}
-                    className="text-red-600 hover:text-red-800 flex items-center gap-2 text-sm font-medium"
-                  >
-                    <Trash2 size={18} />
-                    Remove
-                  </button>
+                <div className="text-right">
+                  <p className="text-2xl font-bold">
+                    ₦{formatPrice(item.price * item.quantity)}
+                  </p>
                 </div>
               </div>
+            ))}
+          </div>
 
-              <div className="text-right min-w-[120px]">
-                <p className="text-xl font-bold text-gray-900">
-                  ₦{(item.price * item.quantity).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">Subtotal</p>
-              </div>
-            </div>
-          ))}
-        </div>
+          {/* Order Summary */}
+          <div className="bg-white rounded-2xl shadow-sm p-8 sticky top-8">
+            <h2 className="text-2xl font-bold mb-8">Order Summary</h2>
 
-        {/* Order Summary */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-8 rounded-xl shadow-sm sticky top-8">
-            <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
+            <div className="space-y-5">
+              <div className="flex justify-between text-lg">
+                <span className="text-gray-600">Subtotal ({totalItems()} items)</span>
+                <span className="font-semibold">₦{totalPrice().toLocaleString()}</span>
+              </div>
 
-            <div className="space-y-4 text-gray-700">
-              <div className="flex justify-between">
-                <span>Subtotal ({totalItems()} items)</span>
-                <span>₦{totalPrice().toLocaleString()}</span>
+              <div className="flex justify-between text-lg">
+                <span className="text-gray-600">Shipping</span>
+                <span className="text-green-600 font-medium">Free</span>
               </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span className="text-green-600">Calculated at checkout</span>
-              </div>
-              <div className="border-t pt-4 mt-4">
-                <div className="flex justify-between text-xl font-bold">
+
+              <div className="border-t pt-6 mt-6">
+                <div className="flex justify-between text-2xl font-bold">
                   <span>Total</span>
                   <span className="text-orange-600">₦{totalPrice().toLocaleString()}</span>
                 </div>
@@ -124,14 +125,10 @@ export default function CartPage() {
             </div>
 
             <Link href="/checkout">
-              <button className="w-full bg-orange-600 text-white py-5 rounded-xl mt-8 hover:bg-orange-700 transition font-bold text-lg">
+              <button className="w-full bg-orange-600 text-white py-5 rounded-2xl mt-10 text-lg font-bold hover:bg-orange-700 transition">
                 Proceed to Checkout
               </button>
             </Link>
-
-            <p className="text-center text-sm text-gray-500 mt-4">
-              Secure checkout • Free shipping on orders over ₦50,000
-            </p>
           </div>
         </div>
       </div>

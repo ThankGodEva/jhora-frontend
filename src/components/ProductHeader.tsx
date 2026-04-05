@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/lib/cartStore';
 import { useRouter, usePathname } from 'next/navigation';
-import { Heart } from 'lucide-react';
+import { Heart, User } from 'lucide-react';
 import { useWishlistStore } from '@/lib/wishlistStore';
 
 export default function ProductHeader() {
@@ -93,6 +93,10 @@ export default function ProductHeader() {
                   {wishlistCount}
                 </span>
               )}
+            </Link>
+
+            <Link href="/dashboard" className="text-gray-600 hover:text-orange-600">
+              <User size={24} />
             </Link>
           </div>
           
